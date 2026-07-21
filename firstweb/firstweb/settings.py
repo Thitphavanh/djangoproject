@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ob49b)w*xn5@^7)klpa@lot69%kx)ajtstrz(u3n4ckjcumz(e'
+# SECRET_KEY = 'django-insecure-ob49b)w*xn5@^7)klpa@lot69%kx)ajtstrz(u3n4ckjcumz(e'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
 
-ALLOWED_HOSTS = ['*'] # * คือ เป็นการอนุญาตให้สามารถนำโปรเจคนี้ไปรันได้ทุกโฮส (ip อะไรก็ได้)
+# ALLOWED_HOSTS = ['*'] # * คือ เป็นการอนุญาตให้สามารถนำโปรเจคนี้ไปรันได้ทุกโฮส (ip อะไรก็ได้)
+
+
+SECRET_KEY = os.getenv('SECRET_KEY', 'e8XT7lhjJa-oXsr8fESNWUhzYYoK_YVnwW5AgmMHe-XihmNI2KVgcu7ELnsJ6eQKvFY')
+
+DEBUG = os.getenv('DEBUG', '1')
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',')
 
 
 # Application definition
@@ -38,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
+    'shop',
 
 ]
 
