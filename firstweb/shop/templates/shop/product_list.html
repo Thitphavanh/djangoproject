@@ -1,0 +1,139 @@
+{% extends 'shop/base.html' %}
+{% load humanize shop_extras %}
+
+{% block title %}สินค้าทั้งหมด &middot; UNCLE.COMPUTER{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+
+  <div class="mb-8">
+    <p class="font-heading text-xs font-semibold uppercase tracking-[0.2em] text-accent-600">แคตตาล็อกสินค้า</p>
+    <h1 class="mt-2 font-heading text-3xl font-bold text-ink-900 sm:text-4xl">สินค้าไอทีทั้งหมด</h1>
+    <p class="mt-2 text-sm text-ink-400">พบสินค้า {{ total_count }} รายการ{% if has_filters %} ที่ตรงกับตัวกรองของคุณ{% endif %}</p>
+  </div>
+
+  <form method="get" id="filter-form" class="mb-6 space-y-4">
+    <input type="hidden" name="category" value="{{ selected_category }}">
+
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <label class="relative flex-1">
+        <span class="sr-only">ค้นหาสินค้า</span>
+        <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-ink-400" style="width:18px;height:18px" viewBox="0 0 24 24"><use href="#icon-search"/></svg>
+        <input
+          type="text"
+          name="q"
+          value="{{ query }}"
+          placeholder="ค้นหาชื่อสินค้า, แบรนด์ หรือสเปก..."
+          class="w-full rounded-full border border-ink-100 bg-ink-50/60 py-2.5 pl-10 pr-4 text-sm text-ink-900 placeholder:text-ink-400 outline-none transition focus:border-accent-600 focus:bg-white focus:ring-2 focus:ring-accent-600/20"
+        >
+      </label>
+
+      <select name="brand" onchange="this.form.submit()"
+        class="cursor-pointer rounded-full border border-ink-100 bg-ink-50/60 px-4 py-2.5 text-sm font-medium text-ink-900 outline-none transition focus:border-accent-600 focus:ring-2 focus:ring-accent-600/20 sm:w-48">
+        <option value="">ทุกแบรนด์</option>
+        {% for brand in brands %}
+          <option value="{{ brand.name }}" {% if brand.name == selected_brand %}selected{% endif %}>{{ brand.name }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="sort" onchange="this.form.submit()"
+        class="cursor-pointer rounded-full border border-ink-100 bg-ink-50/60 px-4 py-2.5 text-sm font-medium text-ink-900 outline-none transition focus:border-accent-600 focus:ring-2 focus:ring-accent-600/20 sm:w-48">
+        {% for key, option in sort_options.items %}
+          <option value="{{ key }}" {% if key == sort_key %}selected{% endif %}>{{ option.1 }}</option>
+        {% endfor %}
+      </select>
+
+      <noscript><button type="submit" class="rounded-full bg-ink-900 px-5 py-2.5 text-sm font-medium text-white">ค้นหา</button></noscript>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <svg class="h-4 w-4 shrink-0 text-ink-400" viewBox="0 0 24 24"><use href="#icon-filter"/></svg>
+      <div class="chip-row flex gap-2 overflow-x-auto pb-1">
+        {% for chip in category_links %}
+          <a href="{{ chip.url }}"
+            class="shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition
+            {% if chip.active %}bg-ink-900 text-white{% else %}bg-ink-50 text-ink-600 hover:bg-ink-100{% endif %}">
+            {{ chip.name }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if has_filters %}
+      <div>
+        <a href="{% url 'shop:product_list' %}" class="inline-flex items-center gap-1.5 text-sm font-medium text-accent-600 hover:text-accent-700">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24"><use href="#icon-close"/></svg>
+          ล้างตัวกรองทั้งหมด
+        </a>
+      </div>
+    {% endif %}
+  </form>
+
+  {% if products %}
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {% for product in products %}
+        <a href="{% url 'shop:product_detail' product.pk %}"
+          class="group flex flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-ink-900 hover:shadow-lg hover:shadow-ink-900/5">
+          <div class="flex aspect-[4/3] items-center justify-center bg-ink-50 transition-colors group-hover:bg-accent-50">
+            <svg class="h-14 w-14 text-ink-400 transition-colors group-hover:text-accent-600" viewBox="0 0 24 24">
+              <use href="#icon-{{ product.category.name|category_icon }}"/>
+            </svg>
+          </div>
+          <div class="flex flex-1 flex-col p-4">
+            <p class="text-xs font-medium uppercase tracking-wide text-ink-400">{{ product.brand.name }} &middot; {{ product.category.name }}</p>
+            <h2 class="mt-1.5 line-clamp-2 min-h-[2.75rem] font-heading text-sm font-semibold leading-snug text-ink-900">{{ product.name }}</h2>
+            <div class="mt-3 flex items-center justify-between">
+              <p class="font-heading text-lg font-bold text-accent-600">฿{{ product.price|floatformat:0|intcomma }}</p>
+              <span class="flex items-center gap-1 text-xs font-medium text-ink-400 transition group-hover:text-ink-900">
+                ดูสินค้า
+                <svg class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24"><use href="#icon-chevron-right"/></svg>
+              </span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+      <nav aria-label="สลับหน้า" class="mt-10 flex items-center justify-center gap-1.5">
+        {% if page_obj.has_previous %}
+          <a href="{{ page_query_prefix }}{{ page_obj.previous_page_number }}" aria-label="หน้าก่อนหน้า"
+            class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-100 text-ink-600 transition hover:border-ink-900 hover:text-ink-900">
+            <svg class="h-4 w-4" viewBox="0 0 24 24"><use href="#icon-chevron-left"/></svg>
+          </a>
+        {% else %}
+          <span class="flex h-9 w-9 items-center justify-center rounded-full text-ink-200"><svg class="h-4 w-4" viewBox="0 0 24 24"><use href="#icon-chevron-left"/></svg></span>
+        {% endif %}
+
+        {% for num in elided_range %}
+          {% if num == ellipsis %}
+            <span class="flex h-9 w-9 items-center justify-center text-sm text-ink-400">&hellip;</span>
+          {% elif num == page_obj.number %}
+            <span aria-current="page" class="flex h-9 w-9 items-center justify-center rounded-full bg-ink-900 text-sm font-semibold text-white">{{ num }}</span>
+          {% else %}
+            <a href="{{ page_query_prefix }}{{ num }}" class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium text-ink-600 transition hover:bg-ink-50">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="{{ page_query_prefix }}{{ page_obj.next_page_number }}" aria-label="หน้าถัดไป"
+            class="flex h-9 w-9 items-center justify-center rounded-full border border-ink-100 text-ink-600 transition hover:border-ink-900 hover:text-ink-900">
+            <svg class="h-4 w-4" viewBox="0 0 24 24"><use href="#icon-chevron-right"/></svg>
+          </a>
+        {% else %}
+          <span class="flex h-9 w-9 items-center justify-center rounded-full text-ink-200"><svg class="h-4 w-4" viewBox="0 0 24 24"><use href="#icon-chevron-right"/></svg></span>
+        {% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <div class="flex flex-col items-center rounded-2xl border border-dashed border-ink-100 py-20 text-center">
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-ink-50 text-ink-400">
+        <svg class="h-7 w-7" viewBox="0 0 24 24"><use href="#icon-search"/></svg>
+      </div>
+      <h2 class="mt-4 font-heading text-lg font-semibold text-ink-900">ไม่พบสินค้าที่ค้นหา</h2>
+      <p class="mt-1 text-sm text-ink-400">ลองเปลี่ยนคำค้นหาหรือล้างตัวกรองเพื่อดูสินค้าทั้งหมด</p>
+      <a href="{% url 'shop:product_list' %}" class="mt-5 rounded-full bg-ink-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-accent-600">ล้างตัวกรอง</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

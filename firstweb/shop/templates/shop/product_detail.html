@@ -1,0 +1,102 @@
+{% extends 'shop/base.html' %}
+{% load humanize shop_extras %}
+
+{% block title %}{{ product.name }} &middot; UNCLE.COMPUTER{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+  <nav aria-label="breadcrumb" class="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-ink-400">
+    <a href="{% url 'shop:product_list' %}" class="transition hover:text-ink-900">สินค้าทั้งหมด</a>
+    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24"><use href="#icon-chevron-right"/></svg>
+    <a href="{% url 'shop:product_list' %}?category={{ product.category.name|urlencode }}" class="transition hover:text-ink-900">{{ product.category.name }}</a>
+    <svg class="h-3.5 w-3.5" viewBox="0 0 24 24"><use href="#icon-chevron-right"/></svg>
+    <span class="truncate text-ink-900">{{ product.name }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-10 lg:grid-cols-2">
+    <!-- Media -->
+    <div>
+      <div class="flex aspect-square items-center justify-center rounded-3xl bg-ink-50">
+        <svg class="h-40 w-40 text-ink-400" viewBox="0 0 24 24">
+          <use href="#icon-{{ product.category.name|category_icon }}"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="flex flex-col">
+      <div class="flex items-center gap-2">
+        <span class="rounded-full bg-ink-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-ink-600">{{ product.category.name }}</span>
+        <span class="rounded-full bg-accent-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-600">{{ product.brand.name }}</span>
+      </div>
+
+      <h1 class="mt-4 font-heading text-2xl font-bold leading-tight text-ink-900 sm:text-3xl">{{ product.name }}</h1>
+
+      <p class="mt-4 font-heading text-3xl font-bold text-accent-600">฿{{ product.price|floatformat:0|intcomma }}</p>
+
+      {% if spec_items %}
+        <div class="mt-6 rounded-2xl border border-ink-100 p-5">
+          <h2 class="font-heading text-sm font-semibold text-ink-900">สเปกสินค้า</h2>
+          <ul class="mt-3 space-y-2.5">
+            {% for spec in spec_items %}
+              <li class="flex items-start gap-2.5 text-sm text-ink-600">
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-accent-600" viewBox="0 0 24 24"><use href="#icon-check"/></svg>
+                <span>{{ spec }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="mt-6 flex items-center gap-4">
+        <span class="text-sm font-medium text-ink-900">จำนวน</span>
+        <div class="flex items-center rounded-full border border-ink-100">
+          <button type="button" data-qty-decrease aria-label="ลดจำนวน" class="flex h-10 w-10 items-center justify-center text-lg text-ink-600 transition hover:text-accent-600">&minus;</button>
+          <span data-qty-value class="w-8 text-center text-sm font-semibold text-ink-900">1</span>
+          <button type="button" data-qty-increase aria-label="เพิ่มจำนวน" class="flex h-10 w-10 items-center justify-center text-lg text-ink-600 transition hover:text-accent-600">&plus;</button>
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+        <button type="button" class="flex-1 rounded-full bg-ink-900 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-accent-600">
+          สอบถาม / สั่งซื้อสินค้านี้
+        </button>
+        <button type="button" data-copy-link
+          class="flex items-center justify-center gap-2 rounded-full border border-ink-100 px-6 py-3.5 text-sm font-semibold text-ink-900 transition hover:border-ink-900">
+          <svg class="h-4 w-4" viewBox="0 0 24 24"><use href="#icon-link"/></svg>
+          คัดลอกลิงก์
+        </button>
+      </div>
+
+      <a href="{% url 'shop:product_list' %}" class="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-ink-400 transition hover:text-ink-900">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24"><use href="#icon-chevron-left"/></svg>
+        กลับไปหน้าสินค้าทั้งหมด
+      </a>
+    </div>
+  </div>
+
+  {% if related_products %}
+    <div class="mt-16">
+      <h2 class="font-heading text-xl font-bold text-ink-900">สินค้าที่เกี่ยวข้อง</h2>
+      <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {% for item in related_products %}
+          <a href="{% url 'shop:product_detail' item.pk %}"
+            class="group flex flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white transition duration-200 hover:-translate-y-0.5 hover:border-ink-900 hover:shadow-lg hover:shadow-ink-900/5">
+            <div class="flex aspect-[4/3] items-center justify-center bg-ink-50 transition-colors group-hover:bg-accent-50">
+              <svg class="h-12 w-12 text-ink-400 transition-colors group-hover:text-accent-600" viewBox="0 0 24 24">
+                <use href="#icon-{{ item.category.name|category_icon }}"/>
+              </svg>
+            </div>
+            <div class="flex flex-1 flex-col p-4">
+              <p class="text-xs font-medium uppercase tracking-wide text-ink-400">{{ item.brand.name }}</p>
+              <h3 class="mt-1.5 line-clamp-2 min-h-[2.75rem] font-heading text-sm font-semibold leading-snug text-ink-900">{{ item.name }}</h3>
+              <p class="mt-3 font-heading text-base font-bold text-accent-600">฿{{ item.price|floatformat:0|intcomma }}</p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
