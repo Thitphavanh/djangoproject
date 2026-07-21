@@ -31,9 +31,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-CHANGE-ME-set-a-real-SECRET_KEY-in-your-.env-file')
 
-DEBUG = os.getenv('DEBUG', '1')
+DEBUG = os.getenv('DEBUG', '1') == '1'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',')
+
+CSRF_TRUSTED_ORIGINS = [
+    origin for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin
+]
 
 
 # Application definition
