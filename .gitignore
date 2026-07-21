@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Django
+firstweb/db.sqlite3
+firstweb/media/
+staticfiles/
+
+# Secrets / environment
+.env
+*.env
+
+# OS
+.DS_Store

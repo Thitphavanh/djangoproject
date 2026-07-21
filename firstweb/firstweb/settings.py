@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ALLOWED_HOSTS = ['*'] # * คือ เป็นการอนุญาตให้สามารถนำโปรเจคนี้ไปรันได้ทุกโฮส (ip อะไรก็ได้)
 
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'e8XT7lhjJa-oXsr8fESNWUhzYYoK_YVnwW5AgmMHe-XihmNI2KVgcu7ELnsJ6eQKvFY')
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-CHANGE-ME-set-a-real-SECRET_KEY-in-your-.env-file')
 
 DEBUG = os.getenv('DEBUG', '1')
 
